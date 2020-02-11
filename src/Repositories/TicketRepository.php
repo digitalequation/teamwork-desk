@@ -2,11 +2,13 @@
 
 namespace Digitalequation\TeamworkDesk\Repositories;
 
+use DB;
 use Digitalequation\TeamworkDesk\Contracts\TicketRepository as TicketRepositoryContract;
 use Digitalequation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
-use DigitalEquation\TeamworkDesk\Services\Teamwork;
+use DigitalEquation\TeamworkDesk\Services\Tickets;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illumintate\Contracts\Auth\Authenticatable;
 use RuntimeException;
 
@@ -19,9 +21,9 @@ class TicketRepository implements TicketRepositoryContract
     {
         return DB::try(function () use ($user, $data) {
             $payload = [
-                'assignedTo'          => Teamwork::desk()->me()['user']['id'],
-                'inboxId'             => Teamwork::desk()->inbox('Decker (TEST)')['id'],
-                'tags'                => 'NewsWire ticket',
+                'assignedTo'          => Tickets::me()['user']['id'],
+                'inboxId'             => Tickets::inbox(config('teamwork-desk.inbox'))['id'],
+                'tags'                => 'Ticket',
                 'priority'            => $data->priority ?? 'low',
                 'status'              => 'active',
                 'source'              => 'Email (Manual)',
@@ -34,7 +36,7 @@ class TicketRepository implements TicketRepositoryContract
                 'message'             => $data->message,
             ];
 
-            $response = Teamwork::tickets()->post($payload);
+            $response = Tickets::post($payload);
 
             if (isset($response['errors'])) {
                 throw new RuntimeException('Something went wrong, please try again later!');
@@ -73,12 +75,12 @@ class TicketRepository implements TicketRepositoryContract
      */
     public function update(Request $request): array
     {
-        $customerId = Auth::user()->customerSupportId();
+        $customerId = Auth::user()->customer_support_id;
 
         $files       = [];
         $attachments = [];
         foreach ($request->file('files') as $file) {
-            $response      = Teamwork::desk()->upload($customerId, $file);
+            $response      = Tickets::upload($customerId, $file);
             $attachments[] = $response['id'];
             $files[]       = $response;
         }
