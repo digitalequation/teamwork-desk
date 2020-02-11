@@ -3,27 +3,38 @@
 namespace DigitalEquation\TeamworkDesk\Services;
 
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkInboxException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkParameterException;
-use DigitalEquation\TeamworkDesk\HttpClient;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkUploadException;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
+use Illuminate\Support\Facades\File;
 
 class Tickets
 {
-    use HttpClient;
+    public static Client $client;
+
+    public function __construct()
+    {
+        static::$client = new Client([
+            'base_uri' => sprintf('https://%s.teamwork.com/desk/v1/', config('teamwork-desk.domain')),
+            'auth'     => [config('teamwork-desk.key'), ''],
+        ]);
+    }
 
     /**
      * Get tickets priorities.
      *
      * @return array
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException
+     * @throws TeamworkHttpException
      */
-    public function priorities(): array
+    public static function priorities(): array
     {
         try {
             /** @var Response $response */
-            $response = $this->client->get('ticketpriorities.json');
+            $response = static::$client->get('ticketpriorities.json');
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -39,13 +50,13 @@ class Tickets
      * @param int $customerId
      *
      * @return array
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException
+     * @throws TeamworkHttpException
      */
-    public function customer($customerId): array
+    public static function customer($customerId): array
     {
         try {
             /** @var Response $response */
-            $response = $this->client->get(sprintf('customers/%s/previoustickets.json', $customerId));
+            $response = static::$client->get(sprintf('customers/%s/previoustickets.json', $customerId));
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -61,13 +72,13 @@ class Tickets
      * @param array $data
      *
      * @return array
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException
+     * @throws TeamworkHttpException
      */
-    public function post($data): array
+    public static function post($data): array
     {
         try {
             /** @var Response $response */
-            $response = $this->client->post('tickets.json', [
+            $response = static::$client->post('tickets.json', [
                 'form_params' => $data,
             ]);
 
@@ -86,10 +97,10 @@ class Tickets
      * @param array $data
      *
      * @return array
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkParameterException
+     * @throws TeamworkHttpException
+     * @throws TeamworkParameterException
      */
-    public function reply(array $data): array
+    public static function reply(array $data): array
     {
         if (empty($data['ticketId'])) {
             throw new TeamworkParameterException('The `reply` method expects the passed array param to contain `ticketId`', 400);
@@ -97,7 +108,7 @@ class Tickets
 
         try {
             /** @var Response $response */
-            $response = $this->client->post(sprintf('tickets/%s.json', $data['ticketId']), [
+            $response = static::$client->post(sprintf('tickets/%s.json', $data['ticketId']), [
                 'form_params' => $data,
             ]);
 
@@ -116,17 +127,171 @@ class Tickets
      * @param int $ticketId
      *
      * @return array
-     * @throws \DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException
+     * @throws TeamworkHttpException
      */
-    public function ticket($ticketId): array
+    public static function ticket($ticketId): array
     {
         try {
             /** @var Response $response */
-            $response = $this->client->get(sprintf('tickets/%s.json', $ticketId));
+            $response = static::$client->get(sprintf('tickets/%s.json', $ticketId));
             /** @var Stream $body */
             $body = $response->getBody();
 
             return json_decode($body->getContents(), true);
+        } catch (ClientException $e) {
+            throw new TeamworkHttpException($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Return an inbox by name.
+     *
+     * @param string $name
+     *
+     * @return array
+     * @throws TeamworkHttpException
+     * @throws TeamworkInboxException
+     */
+    public static function inbox(string $name): array
+    {
+        try {
+            /** @var Response $response */
+            $response = static::$client->get('inboxes.json');
+            /** @var Stream $body */
+            $body    = $response->getBody();
+            $inboxes = json_decode($body->getContents(), true);
+
+            $inbox = collect($inboxes['inboxes'])->first(
+                function ($inbox) use ($name) {
+                    return $inbox['name'] === $name;
+                }
+            );
+
+            if (!$inbox) {
+                throw new TeamworkInboxException("No inbox found with the name: $name!", 400);
+            }
+
+            return $inbox;
+        } catch (ClientException $e) {
+            throw new TeamworkHttpException($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Get teamwork desk inboxes.
+     *
+     * @return array
+     * @throws TeamworkHttpException
+     */
+    public static function inboxes(): array
+    {
+        try {
+            /** @var Response $response */
+            $response = static::$client->get('inboxes.json');
+            /** @var Stream $body */
+            $body = $response->getBody();
+
+            return json_decode($body->getContents(), true);
+        } catch (ClientException $e) {
+            throw new TeamworkHttpException($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Return the current client info.
+     *
+     * @return array
+     * @throws TeamworkHttpException
+     */
+    public static function me(): array
+    {
+        try {
+            /** @var Response $response */
+            $response = static::$client->get('me.json');
+            /** @var Stream $body */
+            $body = $response->getBody();
+
+            return json_decode($body->getContents(), true);
+        } catch (ClientException $e) {
+            throw new TeamworkHttpException($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Update the customer, based on customerId.
+     *
+     * @param array $data = ['customerId', 'email', 'firstName', 'lastName', 'phone', 'mobile'];
+     *
+     * @return array
+     * @throws TeamworkHttpException
+     */
+    public static function postCustomer($data): array
+    {
+        try {
+            /** @var Response $response */
+            $response = static::$client->put('customers/' . $data['customerId'] . '.json', [
+                'json' => $data,
+            ]);
+
+            /** @var Stream $body */
+            $body = $response->getBody();
+
+            return json_decode($body->getContents(), true);
+        } catch (ClientException $e) {
+            throw new TeamworkHttpException($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Upload file to teamwork desk.
+     *
+     * @param $userId
+     * @param $file
+     *
+     * @return array
+     * @throws TeamworkHttpException
+     * @throws TeamworkUploadException
+     */
+    public static function upload($userId, $file): array
+    {
+        if (empty($file)) {
+            throw new TeamworkUploadException('No file provided.', 400);
+        }
+
+        $filename  = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $path      = sys_get_temp_dir();
+        $temp      = $file->move($path, $filename);
+        $stream    = fopen($temp->getPathName(), 'r');
+
+        try {
+            /** @var Response $response */
+            $response = static::$client->post('upload/attachment', [
+                'multipart' => [
+                    [
+                        'name'     => 'file',
+                        'contents' => $stream,
+                    ], [
+                        'name'     => 'userId',
+                        'contents' => $userId,
+                    ],
+                ],
+            ]);
+            /** @var Stream $body */
+            $body = $response->getBody();
+            $body = json_decode($body->getContents(), true);
+
+            if (!empty($stream)) {
+                File::delete($temp->getPathName());
+            }
+
+            return [
+                'id'        => $body['attachment']['id'],
+                'url'       => $body['attachment']['downloadURL'],
+                'extension' => $extension,
+                'name'      => $body['attachment']['filename'],
+                'size'      => $body['attachment']['size'],
+            ];
         } catch (ClientException $e) {
             throw new TeamworkHttpException($e->getMessage(), 400);
         }
