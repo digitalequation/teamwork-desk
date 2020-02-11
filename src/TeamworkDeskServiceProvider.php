@@ -41,6 +41,10 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         Route::group($this->routeApiConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         });
+
+        Route::group($this->routeWebConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        });
     }
 
     /**
@@ -54,6 +58,20 @@ class TeamworkDeskServiceProvider extends ServiceProvider
             'as'         => config('teamwork-desk.route_group.api.as', 'api.'),
             'prefix'     => config('teamwork-desk.route_group.api.prefix', 'api'),
             'middleware' => config('teamwork-desk.route_group.api.middleware', ['api', 'auth:api']),
+        ];
+    }
+
+    /**
+     * Get the Teamwork Desk [web] route group configuration array.
+     */
+    protected function routeWebConfiguration(): array
+    {
+        return [
+            'namespace'  => 'DigitalEquation\TeamworkDesk\Http\Controllers',
+            'domain'     => config('teamwork-desk.route_group.web.domain', null),
+            'as'         => config('teamwork-desk.route_group.web.as', null),
+            'prefix'     => config('teamwork-desk.route_group.web.prefix', '/'),
+            'middleware' => config('teamwork-desk.route_group.web.middleware', 'web'),
         ];
     }
 
