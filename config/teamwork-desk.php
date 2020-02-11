@@ -40,24 +40,20 @@ return [
      | Teamwork Desk Webhook Token
      |--------------------------------------------------------------------------
      |
+     | This is the secret token saved on each webhook on WebHooks Settings page.
+     | See: https://your-domain.teamwork.com/desk/settings/general/webhooks
      |
      */
     'webhook_token' => env('TEAMWORK_DESK_WEBHOOK_TOKEN'),
 
     /*
      |--------------------------------------------------------------------------
-     | Teamwork Desk Site ID
-     |--------------------------------------------------------------------------
-     |
-     |
-     */
-    'site_id' => env('TEAMWORK_DESK_SITE_ID'),
-
-    /*
-     |--------------------------------------------------------------------------
      | Teamwork Desk Inbox
      |--------------------------------------------------------------------------
      |
+     | The Inbox is the name of the Teamwork Desk Inbox name.
+     | See: https://your-domain.teamwork.com/desk/inboxes for a list of
+     | available inboxes.
      |
      */
     'inbox' => env('TEAMWORK_DESK_INBOX'),
@@ -74,6 +70,13 @@ return [
      |
      */
     'route_group' => [
+        'web' => [
+            'domain'     => null,
+            'as'         => null,
+            'prefix'     => null,
+            'middleware' => 'web'
+        ],
+
         'api' => [
             'domain'     => null,
             'as'         => 'api.',
