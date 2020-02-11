@@ -2,7 +2,6 @@
 
 namespace Digitalequation\TeamworkDesk\Repositories;
 
-use DB;
 use Digitalequation\TeamworkDesk\Contracts\TicketRepository as TicketRepositoryContract;
 use Digitalequation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
@@ -14,6 +13,16 @@ use RuntimeException;
 
 class TicketRepository implements TicketRepositoryContract
 {
+    protected Tickets $tickets;
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct(Tickets $tickets)
+    {
+        $this->tickets = $tickets;
+    }
+
     /**
      * @inheritDoc
      */
@@ -21,8 +30,8 @@ class TicketRepository implements TicketRepositoryContract
     {
         return DB::try(function () use ($user, $data) {
             $payload = [
-                'assignedTo'          => Tickets::me()['user']['id'],
-                'inboxId'             => Tickets::inbox(config('teamwork-desk.inbox'))['id'],
+                'assignedTo'          => $this->tickets->me()['user']['id'],
+                'inboxId'             => $this->tickets->inbox(config('teamwork-desk.inbox'))['id'],
                 'tags'                => 'Ticket',
                 'priority'            => $data->priority ?? 'low',
                 'status'              => 'active',
@@ -36,7 +45,7 @@ class TicketRepository implements TicketRepositoryContract
                 'message'             => $data->message,
             ];
 
-            $response = Tickets::post($payload);
+            $response = $this->tickets->post($payload);
 
             if (isset($response['errors'])) {
                 throw new RuntimeException('Something went wrong, please try again later!');
@@ -80,7 +89,7 @@ class TicketRepository implements TicketRepositoryContract
         $files       = [];
         $attachments = [];
         foreach ($request->file('files') as $file) {
-            $response      = Tickets::upload($customerId, $file);
+            $response      = $this->tickets->upload($customerId, $file);
             $attachments[] = $response['id'];
             $files[]       = $response;
         }
