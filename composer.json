@@ -19,7 +19,8 @@
     "php": "^7.4",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^6.5",
-    "illuminate/support": "^6.11"
+    "illuminate/support": "^6.11",
+    "lesichkovm/laravel-advanced-route": "^1.6"
   },
   "require-dev": {
     "orchestra/testbench": "^4.5",
