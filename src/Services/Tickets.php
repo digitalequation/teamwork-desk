@@ -14,14 +14,18 @@ use Illuminate\Support\Facades\File;
 
 class Tickets
 {
-    public static Client $client;
+    public Client $client;
 
-    public function __construct()
+    public function __construct(Client $client = null)
     {
-        static::$client = new Client([
-            'base_uri' => sprintf('https://%s.teamwork.com/desk/v1/', config('teamwork-desk.domain')),
-            'auth'     => [config('teamwork-desk.key'), ''],
-        ]);
+        if ($client instanceof Client) {
+            $this->client = $client;
+        } else {
+            $this->client = new Client([
+                'base_uri' => sprintf('https://%s.teamwork.com/desk/v1/', config('teamwork-desk.domain')),
+                'auth'     => [config('teamwork-desk.key'), ''],
+            ]);
+        }
     }
 
     /**
@@ -30,11 +34,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function priorities(): array
+    public function priorities(): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get('ticketpriorities.json');
+            $response = $this->client->get('ticketpriorities.json');
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -52,11 +56,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function customer($customerId): array
+    public function customer($customerId): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get(sprintf('customers/%s/previoustickets.json', $customerId));
+            $response = $this->client->get(sprintf('customers/%s/previoustickets.json', $customerId));
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -74,11 +78,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function post($data): array
+    public function post($data): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->post('tickets.json', [
+            $response = $this->client->post('tickets.json', [
                 'form_params' => $data,
             ]);
 
@@ -100,7 +104,7 @@ class Tickets
      * @throws TeamworkHttpException
      * @throws TeamworkParameterException
      */
-    public static function reply(array $data): array
+    public function reply(array $data): array
     {
         if (empty($data['ticketId'])) {
             throw new TeamworkParameterException('The `reply` method expects the passed array param to contain `ticketId`', 400);
@@ -108,7 +112,7 @@ class Tickets
 
         try {
             /** @var Response $response */
-            $response = static::$client->post(sprintf('tickets/%s.json', $data['ticketId']), [
+            $response = $this->client->post(sprintf('tickets/%s.json', $data['ticketId']), [
                 'form_params' => $data,
             ]);
 
@@ -129,11 +133,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function ticket($ticketId): array
+    public function ticket($ticketId): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get(sprintf('tickets/%s.json', $ticketId));
+            $response = $this->client->get(sprintf('tickets/%s.json', $ticketId));
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -152,11 +156,11 @@ class Tickets
      * @throws TeamworkHttpException
      * @throws TeamworkInboxException
      */
-    public static function inbox(string $name): array
+    public function inbox(string $name): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get('inboxes.json');
+            $response = $this->client->get('inboxes.json');
             /** @var Stream $body */
             $body    = $response->getBody();
             $inboxes = json_decode($body->getContents(), true);
@@ -183,11 +187,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function inboxes(): array
+    public function inboxes(): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get('inboxes.json');
+            $response = $this->client->get('inboxes.json');
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -203,11 +207,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function me(): array
+    public function me(): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->get('me.json');
+            $response = $this->client->get('me.json');
             /** @var Stream $body */
             $body = $response->getBody();
 
@@ -225,11 +229,11 @@ class Tickets
      * @return array
      * @throws TeamworkHttpException
      */
-    public static function postCustomer($data): array
+    public function postCustomer($data): array
     {
         try {
             /** @var Response $response */
-            $response = static::$client->put('customers/' . $data['customerId'] . '.json', [
+            $response = $this->client->put('customers/' . $data['customerId'] . '.json', [
                 'json' => $data,
             ]);
 
@@ -252,7 +256,7 @@ class Tickets
      * @throws TeamworkHttpException
      * @throws TeamworkUploadException
      */
-    public static function upload($userId, $file): array
+    public function upload($userId, $file): array
     {
         if (empty($file)) {
             throw new TeamworkUploadException('No file provided.', 400);
@@ -266,7 +270,7 @@ class Tickets
 
         try {
             /** @var Response $response */
-            $response = static::$client->post('upload/attachment', [
+            $response = $this->client->post('upload/attachment', [
                 'multipart' => [
                     [
                         'name'     => 'file',
