@@ -38,6 +38,9 @@ class InstallCommand extends Command
             $this->comment('Publishing Teamwork Desk Database Migrations...');
             $this->callSilent('vendor:publish', ['--tag' => 'teamwork-desk-migrations']);
 
+            $this->comment('Publishing Teamwork Desk Database Factories...');
+            $this->callSilent('vendor:publish', ['--tag' => 'teamwork-desk-factories']);
+
             $this->comment('Publishing Teamwork Desk Configuration...');
             $this->callSilent('vendor:publish', ['--tag' => 'teamwork-desk-config']);
 
