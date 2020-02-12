@@ -23,7 +23,7 @@ This will publish all the files of the package:
 
 ## Usage
 
-Available commands:
+Available commands:  
 **NOTE:** passing `--force` to any command will overwrite the already published files.
 ``` php
 # Publish the config file
