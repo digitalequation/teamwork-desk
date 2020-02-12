@@ -77,7 +77,7 @@ class TeamworkDeskAPIController extends Controller
     public function postIndex(TicketRequest $request)
     {
         try {
-            $user = auth()->user();
+            $user = Auth::user();
 
             $ticket = $this->ticket->create($user, $request);
 
@@ -118,8 +118,19 @@ class TeamworkDeskAPIController extends Controller
             return error('No files selected for upload...', 422);
         }
 
+        $files       = [];
+        $attachments = [];
+        foreach ($request->file('files') as $file) {
+            $response      = $this->service->upload(Auth::user()->customer_support_id, $file);
+            $attachments[] = $response['id'];
+            $files[]       = $response;
+        }
+
         return success([
-            'attachments' => $this->ticket->upload($request),
+            'attachments' => [
+                'ids'   => $attachments,
+                'files' => $files,
+            ],
         ]);
     }
 }
