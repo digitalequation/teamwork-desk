@@ -2,7 +2,7 @@
 
 namespace DigitalEquation\TeamworkDesk\Tests;
 
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -20,7 +20,7 @@ class TeamworkTestCase extends TestCase
      */
     protected $app;
 
-    protected Tickets $tickets;
+    protected TicketsService $tickets;
 
     /**
      * Define environment setup.
@@ -36,7 +36,7 @@ class TeamworkTestCase extends TestCase
         $app['config']->set('teamwork-desk.key', '04983o4krjwlkhoirtht983uytkjhgkjfh');
 
         $this->app     = $app;
-        $this->tickets = new Tickets();
+        $this->tickets = new TicketsService();
     }
 
     /**

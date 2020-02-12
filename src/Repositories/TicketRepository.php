@@ -7,19 +7,19 @@ use DB;
 use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository as TicketRepositoryContract;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 
 class TicketRepository implements TicketRepositoryContract
 {
-    protected Tickets $tickets;
+    protected TicketsService $tickets;
 
     /**
      * @inheritDoc
      */
-    public function __construct(Tickets $tickets)
+    public function __construct(TicketsService $tickets)
     {
         $this->tickets = $tickets;
     }

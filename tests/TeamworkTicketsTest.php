@@ -4,7 +4,7 @@ namespace DigitalEquation\TeamworkDesk\Tests;
 
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkParameterException;
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 
 class TeamworkTicketsTest extends TeamworkTestCase
 {
@@ -14,7 +14,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->priorities();
+        (new TicketsService)->priorities();
     }
 
     /** @test */
@@ -22,7 +22,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__.'/Mock/Tickets/priorities-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->priorities()));
     }
@@ -33,7 +33,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->customer(52);
+        (new TicketsService)->customer(52);
     }
 
     /** @test */
@@ -41,7 +41,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__.'/Mock/Tickets/customer-tickets-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->customer(529245)));
     }
@@ -52,7 +52,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->ticket(6545);
+        (new TicketsService)->ticket(6545);
     }
 
     /** @test */
@@ -60,7 +60,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__.'/Mock/Tickets/ticket-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->ticket(6546545)));
     }
@@ -71,7 +71,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->post([]);
+        (new TicketsService)->post([]);
     }
 
     /** @test */
@@ -95,7 +95,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
 
         $body     = file_get_contents(__DIR__.'/Mock/Tickets/create-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->post($data)));
     }
@@ -104,7 +104,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     public function it_should_throw_an_parameter_exception_on_ticket_reply_request()
     {
         $this->expectException(TeamworkParameterException::class);
-        (new Tickets)->reply([]);
+        (new TicketsService)->reply([]);
     }
 
     /** @test */
@@ -113,7 +113,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->reply(['ticketId' => 1]);
+        (new TicketsService)->reply(['ticketId' => 1]);
     }
 
     /** @test */
@@ -121,7 +121,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__.'/Mock/Tickets/ticket-reply-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->reply([
             'ticketId'   => 2201568,

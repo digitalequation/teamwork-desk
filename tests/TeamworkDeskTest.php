@@ -5,7 +5,7 @@ namespace DigitalEquation\TeamworkDesk\Tests;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkInboxException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkUploadException;
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 
 class TeamworkDeskTest extends TeamworkTestCase
 {
@@ -15,7 +15,7 @@ class TeamworkDeskTest extends TeamworkTestCase
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->me();
+        (new TicketsService)->me();
     }
 
     /** @test */
@@ -23,7 +23,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__ . '/Mock/Me/response-body.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->me()));
     }
@@ -34,7 +34,7 @@ class TeamworkDeskTest extends TeamworkTestCase
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
         $this->expectException(TeamworkHttpException::class);
-        (new Tickets)->inboxes();
+        (new TicketsService)->inboxes();
     }
 
     /** @test */
@@ -42,7 +42,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/inboxes-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $this->assertEquals($body, json_encode($response->inboxes()));
     }
@@ -54,7 +54,7 @@ class TeamworkDeskTest extends TeamworkTestCase
 
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/inboxes-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
         $response->inbox('undefined-inbox-name');
     }
 
@@ -72,7 +72,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/inboxes-response.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $inboxResponse = file_get_contents(__DIR__ . '/Mock/Desk/inbox-response.json');
         $this->assertEquals($inboxResponse, json_encode($response->inbox('Inbox 1')));
@@ -83,7 +83,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $this->expectException(TeamworkUploadException::class);
 
-        (new Tickets)->upload(24234, '');
+        (new TicketsService)->upload(24234, '');
     }
 
     /** @test */
@@ -94,7 +94,7 @@ class TeamworkDeskTest extends TeamworkTestCase
         $this->expectException(TeamworkHttpException::class);
 
         $request = $this->getUploadFileRequest('file');
-        (new Tickets)->upload(423423, $request->file);
+        (new TicketsService)->upload(423423, $request->file);
     }
 
     /** @test */
@@ -105,7 +105,7 @@ class TeamworkDeskTest extends TeamworkTestCase
 
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/upload-data.json');
         $client   = $this->mockClient(200, $body);
-        $response = new Tickets($client);
+        $response = new TicketsService($client);
 
         $uploadResponse = file_get_contents(__DIR__ . '/Mock/Desk/upload-response.json');
         $this->assertEquals($uploadResponse, json_encode($response->upload(6546545, $file)));

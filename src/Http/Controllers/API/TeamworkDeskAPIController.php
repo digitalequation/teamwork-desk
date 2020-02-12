@@ -7,7 +7,7 @@ use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketReplyRequest;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Notifications\SupportTicket as SupportTicketNotification;
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
@@ -18,9 +18,9 @@ class TeamworkDeskAPIController extends Controller
 {
     protected TicketRepository $ticket;
 
-    protected Tickets $service;
+    protected TicketsService $service;
 
-    public function __construct(TicketRepository $ticket, Tickets $service)
+    public function __construct(TicketRepository $ticket, TicketsService $service)
     {
         $this->middleware('role:user')->only([
             'getIndex',

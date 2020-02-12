@@ -4,16 +4,16 @@ namespace DigitalEquation\TeamworkDesk\Contracts\Repositories;
 
 use App\User;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
-use DigitalEquation\TeamworkDesk\Services\Tickets;
+use DigitalEquation\TeamworkDesk\Services\TicketsService;
 use Illuminate\Http\Request;
 
 interface TicketRepository
 {
     /**
      * TicketRepository constructor.
-     * @param Tickets $tickets
+     * @param TicketsService $tickets
      */
-    public function __construct(Tickets $tickets);
+    public function __construct(TicketsService $tickets);
 
     /**
      * Create a new ticket.
