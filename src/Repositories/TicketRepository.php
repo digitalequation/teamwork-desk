@@ -2,13 +2,14 @@
 
 namespace DigitalEquation\TeamworkDesk\Repositories;
 
+use App\User;
+use DB;
 use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository as TicketRepositoryContract;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
 use DigitalEquation\TeamworkDesk\Services\Tickets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illumintate\Contracts\Auth\Authenticatable;
 use RuntimeException;
 
 class TicketRepository implements TicketRepositoryContract
@@ -26,7 +27,7 @@ class TicketRepository implements TicketRepositoryContract
     /**
      * @inheritDoc
      */
-    public function create(Authenticatable $user, TicketRequest $data): array
+    public function create(User $user, TicketRequest $data): array
     {
         return DB::try(function () use ($user, $data) {
             $payload = [
@@ -52,7 +53,7 @@ class TicketRepository implements TicketRepositoryContract
             }
 
             // Save user associated ticket ID
-            $ticket = new SupportTicket([
+            $ticket = SupportTicket::create([
                 'user_id'          => $user->id,
                 'ticket_id'        => $response['id'],
                 'event_creator_id' => $response['ticket']['CreatedBy']['Int64'],
