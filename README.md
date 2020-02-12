@@ -1,4 +1,4 @@
-# PHP (Laravel) Teamwork Desk
+# PHP (Laravel) Teamwork Desk (Internal Use)
 
 [![Actions Status](https://github.com/digitalequation/teamwork-desk/workflows/Run%20Tests/badge.svg)](https://github.com/digitalequation/teamwork-desk/actions)
 
@@ -10,10 +10,30 @@ You can install the package via composer:
 composer require digitalequation/teamwork-desk
 ```
 
+After the installation is complete, from your project's root run:
+```bash
+php artisan teamwork-desk:install --force
+```
+
+This will publish all the files of the package:
+- migrations
+- factories
+- config file
+- service provider
+
 ## Usage
 
+Available commands:
+**NOTE:** passing `--force` to any command will overwrite the already published files.
 ``` php
-// TODO
+# Publish the config file
+php artisan teamwork-desk:config
+
+# Publish the database factories 
+php artisan teamwork-desk:factories
+
+# Publish the database migrations
+php artisan teamwork-desk:migrations
 ```
 
 ### Testing
