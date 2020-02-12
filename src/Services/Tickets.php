@@ -16,7 +16,7 @@ class Tickets
 {
     public Client $client;
 
-    public function __construct(Client $client = null)
+    public function __construct($client = null)
     {
         if ($client instanceof Client) {
             $this->client = $client;
