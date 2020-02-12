@@ -1,6 +1,6 @@
 <?php
 
-namespace Digitalequation\TeamworkDesk\Http\Requests;
+namespace DigitalEquation\TeamworkDesk\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Digitalequation\TeamworkDesk\Contracts;
+namespace DigitalEquation\TeamworkDesk\Contracts\Repositories;
 
-use Digitalequation\TeamworkDesk\Http\Requests\TicketRequest;
+use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Services\Tickets;
 use Illuminate\Http\Request;
 use Illumintate\Contracts\Auth\Authenticatable;

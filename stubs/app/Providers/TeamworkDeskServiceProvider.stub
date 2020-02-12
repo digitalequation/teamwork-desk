@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use DigitalEquation\TeamworkDesk\TeamworkDeskApplicationServiceProvider;
+use DigitalEquation\TeamworkDesk\TeamworkDeskServiceProvider as TeamworkDeskApplicationServiceProvider;
 
 class TeamworkDeskServiceProvider extends TeamworkDeskApplicationServiceProvider
 {

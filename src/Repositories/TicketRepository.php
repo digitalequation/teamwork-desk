@@ -1,9 +1,9 @@
 <?php
 
-namespace Digitalequation\TeamworkDesk\Repositories;
+namespace DigitalEquation\TeamworkDesk\Repositories;
 
-use Digitalequation\TeamworkDesk\Contracts\TicketRepository as TicketRepositoryContract;
-use Digitalequation\TeamworkDesk\Http\Requests\TicketRequest;
+use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository as TicketRepositoryContract;
+use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
 use DigitalEquation\TeamworkDesk\Services\Tickets;
 use Illuminate\Http\Request;
