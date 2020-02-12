@@ -2,9 +2,8 @@
 
 namespace DigitalEquation\TeamworkDesk;
 
-use DigitalEquation\TeamworkDesk\Console\ConfigCommand;
-use DigitalEquation\TeamworkDesk\Console\InstallCommand;
-use DigitalEquation\TeamworkDesk\Console\MigrationsCommand;
+use Carbon\Carbon;
+use DigitalEquation\TeamworkDesk\Console\{ConfigCommand, FactoriesCommand, InstallCommand, MigrationsCommand};
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +30,15 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         $this->app->singleton('teamwork-desk', function () {
             return new TeamworkDesk;
         });
+
+        // Register tickets service
+        $services = [
+            'Contracts\Repositories\TicketRepository' => 'Repositories\TicketRepository'
+        ];
+
+        foreach ($services as $key => $value) {
+            $this->app->singleton('DigitalEquation\TeamworkDesk\\' . $key, 'DigitalEquation\TeamworkDesk\\' . $value);
+        }
     }
 
     /**
@@ -93,7 +101,8 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         $this->commands([
             InstallCommand::class,
             ConfigCommand::class,
-            MigrationsCommand::class
+            MigrationsCommand::class,
+            FactoriesCommand::class
         ]);
     }
 
@@ -108,11 +117,15 @@ class TeamworkDeskServiceProvider extends ServiceProvider
             ], 'teamwork-desk-migrations');
 
             $this->publishes([
+                __DIR__ . '/../database/factories' => database_path('factories'),
+            ], 'teamwork-desk-factories');
+
+            $this->publishes([
                 __DIR__ . '/../config/teamwork-desk.php' => config_path('teamwork-desk.php'),
             ], 'teamwork-desk-config');
 
             $this->publishes([
-                __DIR__ . '/../stubs/TeamworkDeskServiceProvider.stub' => app_path('Providers/TeamworkDeskServiceProvider.php'),
+                __DIR__ . '/../stubs/app/Providers/TeamworkDeskServiceProvider.stub' => app_path('Providers/TeamworkDeskServiceProvider.php'),
             ], 'teamwork-desk-provider');
         }
     }
