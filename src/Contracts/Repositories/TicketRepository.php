@@ -11,9 +11,9 @@ interface TicketRepository
 {
     /**
      * TicketRepository constructor.
-     * @param TicketService $tickets
+     * @param TicketService $service
      */
-    public function __construct(TicketService $tickets);
+    public function __construct(TicketService $service);
 
     /**
      * Create a new ticket.

@@ -14,14 +14,14 @@ use RuntimeException;
 
 class TicketRepository implements TicketRepositoryContract
 {
-    protected TicketService $tickets;
+    protected TicketService $service;
 
     /**
      * @inheritDoc
      */
-    public function __construct(TicketService $tickets)
+    public function __construct(TicketService $service)
     {
-        $this->tickets = $tickets;
+        $this->service = $service;
     }
 
     /**
@@ -31,8 +31,8 @@ class TicketRepository implements TicketRepositoryContract
     {
         return DB::try(function () use ($user, $data) {
             $payload = [
-                'assignedTo'          => $this->tickets->me()['user']['id'],
-                'inboxId'             => $this->tickets->inbox(config('teamwork-desk.inbox'))['id'],
+                'assignedTo'          => $this->service->me()['user']['id'],
+                'inboxId'             => $this->service->inbox(config('teamwork-desk.inbox'))['id'],
                 'tags'                => 'Ticket',
                 'priority'            => $data->priority ?? 'low',
                 'status'              => 'active',
@@ -46,7 +46,7 @@ class TicketRepository implements TicketRepositoryContract
                 'message'             => $data->message,
             ];
 
-            $response = $this->tickets->post($payload);
+            $response = $this->service->post($payload);
 
             if (isset($response['errors'])) {
                 throw new RuntimeException('Something went wrong, please try again later!');
@@ -90,7 +90,7 @@ class TicketRepository implements TicketRepositoryContract
         $files       = [];
         $attachments = [];
         foreach ($request->file('files') as $file) {
-            $response      = $this->tickets->upload($customerId, $file);
+            $response      = $this->service->upload($customerId, $file);
             $attachments[] = $response['id'];
             $files[]       = $response;
         }
