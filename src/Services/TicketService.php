@@ -12,7 +12,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
 use Illuminate\Support\Facades\File;
 
-class TicketsService
+class TicketService
 {
     public Client $client;
 
