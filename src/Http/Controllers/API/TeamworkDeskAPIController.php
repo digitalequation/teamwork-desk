@@ -1,10 +1,11 @@
 <?php
 
-namespace Digitalequation\TeamworkDesk\Http\API;
+namespace DigitalEquation\TeamworkDesk\Http\Controllers\API;
 
-use Digitalequation\TeamworkDesk\Contracts\TicketRepository;
-use Digitalequation\TeamworkDesk\Http\Requests\TicketReplyRequest;
-use Digitalequation\TeamworkDesk\Http\Requests\TicketRequest;
+use App\Http\Controllers\Controller;
+use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository;
+use DigitalEquation\TeamworkDesk\Http\Requests\TicketReplyRequest;
+use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Notifications\SupportTicket as SupportTicketNotification;
 use DigitalEquation\TeamworkDesk\Services\Tickets;
 use Exception;
@@ -13,11 +14,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class TeamworkDeskAPIController
+class TeamworkDeskAPIController extends Controller
 {
     protected TicketRepository $ticket;
 
-    public function __construct(TicketRepository $ticket)
+    protected Tickets $service;
+
+    public function __construct(TicketRepository $ticket, Tickets $service)
     {
         $this->middleware('role:user')->only([
             'getIndex',
@@ -27,7 +30,8 @@ class TeamworkDeskAPIController
             'postUpload',
         ]);
 
-        $this->ticket = $ticket;
+        $this->ticket  = $ticket;
+        $this->service = $service;
     }
 
     /**
@@ -40,8 +44,8 @@ class TeamworkDeskAPIController
     {
         $customerId = Auth::user()->customer_support_id;
 
-        $priorities = Tickets::tickets()->priorities();
-        $tickets    = !empty($customerId) ? Tickets::tickets()->customer($customerId) : [];
+        $priorities = $this->service->priorities();
+        $tickets    = !empty($customerId) ? $this->service->customer($customerId) : [];
 
         return success([
             'priorities' => $priorities,
@@ -59,7 +63,7 @@ class TeamworkDeskAPIController
      */
     public function getTicket($id)
     {
-        return success(['ticket' => Tickets::tickets()->ticket($id)['ticket']]);
+        return success(['ticket' => $this->service->ticket($id)['ticket']]);
     }
 
     /**
@@ -96,7 +100,7 @@ class TeamworkDeskAPIController
     public function postReply(TicketReplyRequest $request)
     {
         return success([
-            'ticket' => Tickets::tickets()->reply($request->all()),
+            'ticket' => $this->service->reply($request->all()),
         ]);
     }
 
