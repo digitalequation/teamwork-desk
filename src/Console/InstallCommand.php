@@ -3,13 +3,10 @@
 namespace DigitalEquation\TeamworkDesk\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\DetectsApplicationNamespace;
 use Illuminate\Support\Str;
 
 class InstallCommand extends Command
 {
-    use DetectsApplicationNamespace;
-
     /**
      * The name and signature of the console command.
      *
@@ -55,21 +52,7 @@ class InstallCommand extends Command
      */
     protected function registerTeamworkDeskServiceProvider(): void
     {
-        $namespace = Str::replaceLast('\\', '', $this->getAppNamespace());
-
-        $appConfig = file_get_contents(config_path('app.php'));
-
-        if (Str::contains($appConfig, $namespace . '\\Providers\\TeamworkDeskServiceProvider::class')) {
-            return;
-        }
-
-        $lineEndingCount = [
-            "\r\n" => substr_count($appConfig, "\r\n"),
-            "\r" => substr_count($appConfig, "\r"),
-            "\n" => substr_count($appConfig, "\n"),
-        ];
-
-        $eol = array_keys($lineEndingCount, max($lineEndingCount))[0];
+        list($namespace, $appConfig, $eol) = $this->providersConfig();
 
         file_put_contents(config_path('app.php'), str_replace(
             "{$namespace}\\Providers\EventServiceProvider::class," . $eol,
@@ -91,8 +74,27 @@ class InstallCommand extends Command
      */
     protected function teamworkDeskAlreadyInstalled()
     {
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
+        list($namespace, $appConfig) = $this->providersConfig();
 
-        return isset($composer['require']['digitalequation/teamwork-desk']);
+        return Str::contains($appConfig, $namespace . '\\Providers\\TeamworkDeskServiceProvider::class');
+    }
+
+    /**
+     * @return array
+     */
+    private function providersConfig(): array
+    {
+        $namespace = Str::replaceLast('\\', '', app()->getNamespace());
+        $appConfig = file_get_contents(config_path('app.php'));
+
+        $lineEndingCount = [
+            "\r\n" => substr_count($appConfig, "\r\n"),
+            "\r"   => substr_count($appConfig, "\r"),
+            "\n"   => substr_count($appConfig, "\n"),
+        ];
+
+        $eol = array_keys($lineEndingCount, max($lineEndingCount))[0];
+
+        return array($namespace, $appConfig, $eol);
     }
 }
