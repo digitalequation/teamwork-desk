@@ -2,6 +2,9 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 1.0.2 - 2020-02-20
+- remove use of deprecated trait `DetectsApplicationNamespace`
+
 ### 1.0.1 - 2020-02-13
 - small fixes
 
