@@ -12,7 +12,7 @@ composer require digitalequation/teamwork-desk
 
 After the installation is complete, from your project's root run:
 ```bash
-php artisan teamwork-desk:install --force
+php artisan teamwork-desk:install
 ```
 
 This will publish all the files of the package:
