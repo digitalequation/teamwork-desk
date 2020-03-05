@@ -2,6 +2,9 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 1.0.4 - 2020-03-05
+- downgrade guzzle to 6.5
+
 ### 1.0.3 - 2020-03-05
 - support for Laravel 7
 
