@@ -2,6 +2,9 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 1.0.5 - 2020-03-05
+- upgrade orchestral/testbench to 5.0
+
 ### 1.0.4 - 2020-03-05
 - downgrade guzzle to 6.5
 
