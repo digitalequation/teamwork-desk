@@ -85,7 +85,7 @@ class TeamworkDeskAPIController extends Controller
 
             return success(['teamwork' => $ticket]);
         } catch (Exception $e) {
-            return error($e->getMessage(), 422);
+            return error($e->getMessage());
         }
     }
 
@@ -115,7 +115,7 @@ class TeamworkDeskAPIController extends Controller
     public function postUpload(Request $request)
     {
         if (!$request->hasFile('files')) {
-            return error('No files selected for upload...', 422);
+            return error('No files selected for upload...');
         }
 
         $files       = [];
