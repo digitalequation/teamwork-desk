@@ -38,10 +38,9 @@ class TeamworkDeskWebhookController
      * Send notification to user when ticket priority changes
      *
      * @param Request $request
-     *
-     * @return Response
+     * @return mixed
      */
-    public function postPriority(Request $request): Response
+    public function postPriority(Request $request)
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -72,9 +71,9 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return Response
+     * @return mixed
      */
-    public function postStatus(Request $request): Response
+    public function postStatus(Request $request)
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -104,9 +103,9 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return Response
+     * @return mixed
      */
-    public function postReply(Request $request): Response
+    public function postReply(Request $request)
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -134,9 +133,9 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return Response
+     * @return mixed
      */
-    public function postNote(Request $request): Response
+    public function postNote(Request $request)
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -165,10 +164,10 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return Response
+     * @return mixed
      * @throws JsonException
      */
-    public function postDelete(Request $request): Response
+    public function postDelete(Request $request)
     {
         return DB::try(function () use ($request) {
             // Teamwork Desk Webhook data
@@ -200,13 +199,12 @@ class TeamworkDeskWebhookController
     /**
      * Build the user notification
      *
-     * @param Request $request
-     * @param integer $ticketID
-     * @param array $content
-     *
-     * @return Response
+     * @param $request
+     * @param int $ticketID
+     * @param $content
+     * @return mixed
      */
-    protected function buildNotification($request, int $ticketID, $content): Response
+    protected function buildNotification($request, int $ticketID, $content)
     {
         // Get request headers
         $apiSignature     = $request->header('x-desk-signature');
