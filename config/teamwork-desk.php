@@ -12,6 +12,25 @@ return [
     'enabled' => true,
 
     /*
+     |--------------------------------------------------------------------------
+     | Tickets List and Ticket Details URL Segments
+     |--------------------------------------------------------------------------
+     |
+     | This options are used when building the notification messages.
+     |
+     | E.g. for tickets list: support-tickets
+     | Translates to: https://domain.com/support-tickets
+     |
+     | E.g. for ticket details: ticket
+     | Translates to: https://domain.com/support-tickets/ticket
+     |
+     */
+    'tickets_paths' => [
+        'list'    => 'tickets',
+        'details' => 'ticket'
+    ],
+
+    /*
     |--------------------------------------------------------------------------
     | Teamwork Desk Key
     |--------------------------------------------------------------------------
