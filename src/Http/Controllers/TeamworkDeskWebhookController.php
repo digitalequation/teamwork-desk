@@ -2,6 +2,7 @@
 
 namespace DigitalEquation\TeamworkDesk\Http\Controllers;
 
+use DB;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
 use DigitalEquation\TeamworkDesk\Notifications\SupportTicket as SupportTicketNotification;
 use Illuminate\Config\Repository;
