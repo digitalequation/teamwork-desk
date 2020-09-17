@@ -8,6 +8,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
+use JsonException;
 
 class TeamworkDeskWebhookController
 {
@@ -40,7 +41,7 @@ class TeamworkDeskWebhookController
      *
      * @return Response
      */
-    public function postPriority(Request $request)
+    public function postPriority(Request $request): Response
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -56,7 +57,11 @@ class TeamworkDeskWebhookController
             ),
 
             'action_text' => 'View',
-            'action_url'  => sprintf('/tickets/ticket/%s', $data['id']),
+            'action_url'  => sprintf('/%s/%s/%s',
+                config('teamwork-desk.tickets_paths.list'),
+                config('teamwork-desk.tickets_paths.details'),
+                $data['id']
+            ),
         ];
 
         return $this->buildNotification($request, $data['id'], $content);
@@ -69,7 +74,7 @@ class TeamworkDeskWebhookController
      *
      * @return Response
      */
-    public function postStatus(Request $request)
+    public function postStatus(Request $request): Response
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -84,7 +89,11 @@ class TeamworkDeskWebhookController
             ),
 
             'action_text' => 'View',
-            'action_url'  => sprintf('/tickets/ticket/%s', $data['id']),
+            'action_url'  => sprintf('/%s/%s/%s',
+                config('teamwork-desk.tickets_paths.list'),
+                config('teamwork-desk.tickets_paths.details'),
+                $data['id']
+            ),
         ];
 
         return $this->buildNotification($request, $data['id'], $content);
@@ -97,7 +106,7 @@ class TeamworkDeskWebhookController
      *
      * @return Response
      */
-    public function postReply(Request $request)
+    public function postReply(Request $request): Response
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -110,7 +119,11 @@ class TeamworkDeskWebhookController
             ),
 
             'action_text' => 'View',
-            'action_url'  => sprintf('/tickets/ticket/%s', $data['ticket']['id']),
+            'action_url'  => sprintf('/%s/%s/%s',
+                config('teamwork-desk.tickets_paths.list'),
+                config('teamwork-desk.tickets_paths.details'),
+                $data['ticket']['id']
+            ),
         ];
 
         return $this->buildNotification($request, $data['ticket']['id'], $content);
@@ -123,7 +136,7 @@ class TeamworkDeskWebhookController
      *
      * @return Response
      */
-    public function postNote(Request $request)
+    public function postNote(Request $request): Response
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
@@ -153,8 +166,9 @@ class TeamworkDeskWebhookController
      * @param Request $request
      *
      * @return Response
+     * @throws JsonException
      */
-    public function postDelete(Request $request)
+    public function postDelete(Request $request): Response
     {
         return DB::try(function () use ($request) {
             // Teamwork Desk Webhook data
@@ -173,7 +187,7 @@ class TeamworkDeskWebhookController
 
             $notification = $this->buildNotification($request, $data['id'], $content);
 
-            if (json_decode($notification->getContent())->success) {
+            if (json_decode($notification->getContent(), false, 512, JSON_THROW_ON_ERROR)->success) {
                 SupportTicket::where('ticket_id', $data['id'])->delete();
 
                 return success();
@@ -192,7 +206,7 @@ class TeamworkDeskWebhookController
      *
      * @return Response
      */
-    protected function buildNotification($request, int $ticketID, $content)
+    protected function buildNotification($request, int $ticketID, $content): Response
     {
         // Get request headers
         $apiSignature     = $request->header('x-desk-signature');
@@ -223,7 +237,7 @@ class TeamworkDeskWebhookController
      *
      * @return boolean
      */
-    protected function checkSignature($apiSignature)
+    protected function checkSignature($apiSignature): bool
     {
         $body      = file_get_contents('php://input');
         $signature = hash_hmac('sha256', $body, $this->secretToken, false);
