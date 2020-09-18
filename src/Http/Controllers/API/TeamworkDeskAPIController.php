@@ -22,7 +22,7 @@ class TeamworkDeskAPIController extends Controller
 
     public function __construct(TicketRepository $ticket, TicketService $service)
     {
-        $this->middleware('role:user')->only([
+        $this->middleware(config('teamwork-desk.authorization'))->only([
             'getIndex',
             'postIndex',
             'putIndex',
