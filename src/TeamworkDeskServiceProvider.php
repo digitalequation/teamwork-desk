@@ -2,8 +2,6 @@
 
 namespace DigitalEquation\TeamworkDesk;
 
-use Carbon\Carbon;
-use DigitalEquation\TeamworkDesk\Console\{ConfigCommand, FactoriesCommand, InstallCommand, MigrationsCommand};
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,10 +13,40 @@ class TeamworkDeskServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->registerRoutes();
-        $this->registerMigrations();
-        $this->registerPublishing();
-        $this->registerCommands();
+        if ($this->app->runningInConsole()) {
+
+            // Register routes
+            Route::group($this->routeApiConfiguration(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+            });
+
+            Route::group($this->routeWebConfiguration(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            });
+
+            // Publish config file
+            $this->publishes([
+                __DIR__ . '/../config/teamwork-desk.php' => config_path('teamwork-desk.php'),
+            ], 'config');
+
+            // Publish migration files
+            if (
+                !$this->migrationFileExists('users_add_customer_support_id.php')
+                && !$this->migrationFileExists('create_support_tickets_table.php')
+            ) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/users_add_customer_support_id.stub' => database_path(sprintf(
+                        'migrations/%s_users_add_customer_support_id.php',
+                        date('Y_m_d_His')
+                    )),
+
+                    __DIR__ . '/../database/migrations/create_support_tickets_table.stub' => database_path(sprintf(
+                        'migrations/%s_create_support_tickets_table.php',
+                        date('Y_m_d_His')
+                    )),
+                ], 'migrations');
+            }
+        }
     }
 
     public function register(): void
@@ -33,7 +61,7 @@ class TeamworkDeskServiceProvider extends ServiceProvider
 
         // Register tickets service
         $services = [
-            'Contracts\Repositories\TicketRepository' => 'Repositories\TicketRepository'
+            'Contracts\Repositories\TicketRepository' => 'Repositories\TicketRepository',
         ];
 
         foreach ($services as $key => $value) {
@@ -41,23 +69,6 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register the package routes.
-     */
-    protected function registerRoutes(): void
-    {
-        Route::group($this->routeApiConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-        });
-
-        Route::group($this->routeWebConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-        });
-    }
-
-    /**
-     * Get the Teamwork Desk [api] route group configuration array.
-     */
     protected function routeApiConfiguration(): array
     {
         return [
@@ -69,9 +80,6 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         ];
     }
 
-    /**
-     * Get the Teamwork Desk [web] route group configuration array.
-     */
     protected function routeWebConfiguration(): array
     {
         return [
@@ -83,50 +91,15 @@ class TeamworkDeskServiceProvider extends ServiceProvider
         ];
     }
 
-    /**
-     * Register the package migrations.
-     */
-    private function registerMigrations(): void
+    private function migrationFileExists(string $migrationFileName): bool
     {
-        if ($this->app->runningInConsole() && TeamworkDesk::$runsMigrations) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $len = strlen($migrationFileName);
+        foreach (glob(database_path("migrations/*.php")) as $filename) {
+            if ((substr($filename, -$len) === $migrationFileName)) {
+                return true;
+            }
         }
-    }
 
-    /**
-     * Register the package artisan commands.
-     */
-    private function registerCommands(): void
-    {
-        $this->commands([
-            InstallCommand::class,
-            ConfigCommand::class,
-            MigrationsCommand::class,
-            FactoriesCommand::class
-        ]);
-    }
-
-    /**
-     * Register the package's publishable resources.
-     */
-    private function registerPublishing(): void
-    {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'teamwork-desk-migrations');
-
-            $this->publishes([
-                __DIR__ . '/../database/factories' => database_path('factories'),
-            ], 'teamwork-desk-factories');
-
-            $this->publishes([
-                __DIR__ . '/../config/teamwork-desk.php' => config_path('teamwork-desk.php'),
-            ], 'teamwork-desk-config');
-
-            $this->publishes([
-                __DIR__ . '/../stubs/app/Providers/TeamworkDeskServiceProvider.stub' => app_path('Providers/TeamworkDeskServiceProvider.php'),
-            ], 'teamwork-desk-provider');
-        }
+        return false;
     }
 }
