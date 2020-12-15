@@ -9,7 +9,7 @@ use DigitalEquation\TeamworkDesk\Services\TicketService;
 class TeamworkTicketsTest extends TeamworkTestCase
 {
     /** @test */
-    public function it_should_throw_an_http_exception_on_priorities_request()
+    public function it_should_throw_an_http_exception_on_priorities_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
@@ -17,18 +17,20 @@ class TeamworkTicketsTest extends TeamworkTestCase
         (new TicketService)->priorities();
     }
 
-    /** @test */
-    public function it_should_return_all_priorities()
+    /** @test
+     * @throws \JsonException
+     */
+    public function it_should_return_all_priorities(): void
     {
-        $body     = file_get_contents(__DIR__.'/Mock/Tickets/priorities-response.json');
+        $body     = file_get_contents(__DIR__ . '/Mock/Tickets/priorities-response.json');
         $client   = $this->mockClient(200, $body);
         $response = new TicketService($client);
 
-        $this->assertEquals($body, json_encode($response->priorities()));
+        self::assertEquals($body, json_encode($response->priorities(), JSON_THROW_ON_ERROR));
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_customer_tickets_request()
+    public function it_should_throw_an_http_exception_on_customer_tickets_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
@@ -36,18 +38,20 @@ class TeamworkTicketsTest extends TeamworkTestCase
         (new TicketService)->customer(52);
     }
 
-    /** @test */
-    public function it_should_return_a_list_of_customer_tickets()
+    /** @test
+     * @throws \JsonException
+     */
+    public function it_should_return_a_list_of_customer_tickets(): void
     {
-        $body     = file_get_contents(__DIR__.'/Mock/Tickets/customer-tickets-response.json');
+        $body     = file_get_contents(__DIR__ . '/Mock/Tickets/customer-tickets-response.json');
         $client   = $this->mockClient(200, $body);
         $response = new TicketService($client);
 
-        $this->assertEquals($body, json_encode($response->customer(529245)));
+        self::assertEquals($body, json_encode($response->customer(529245), JSON_THROW_ON_ERROR));
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_ticket_request()
+    public function it_should_throw_an_http_exception_on_ticket_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
@@ -55,18 +59,20 @@ class TeamworkTicketsTest extends TeamworkTestCase
         (new TicketService)->ticket(6545);
     }
 
-    /** @test */
-    public function it_should_return_a_ticket()
+    /** @test
+     * @throws \JsonException
+     */
+    public function it_should_return_a_ticket(): void
     {
-        $body     = file_get_contents(__DIR__.'/Mock/Tickets/ticket-response.json');
+        $body     = file_get_contents(__DIR__ . '/Mock/Tickets/ticket-response.json');
         $client   = $this->mockClient(200, $body);
         $response = new TicketService($client);
 
-        $this->assertEquals($body, json_encode($response->ticket(6546545)));
+        self::assertEquals($body, json_encode($response->ticket(6546545), JSON_THROW_ON_ERROR));
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_create_ticket_request()
+    public function it_should_throw_an_http_exception_on_create_ticket_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
@@ -74,8 +80,10 @@ class TeamworkTicketsTest extends TeamworkTestCase
         (new TicketService)->post([]);
     }
 
-    /** @test */
-    public function it_should_create_a_ticket()
+    /** @test
+     * @throws \JsonException
+     */
+    public function it_should_create_a_ticket(): void
     {
         $data = [
             'assignedTo'          => 5465,
@@ -93,22 +101,22 @@ class TeamworkTicketsTest extends TeamworkTestCase
             'message'             => 'Ths is an API test so please ignore this ticket.',
         ];
 
-        $body     = file_get_contents(__DIR__.'/Mock/Tickets/create-response.json');
+        $body     = file_get_contents(__DIR__ . '/Mock/Tickets/create-response.json');
         $client   = $this->mockClient(200, $body);
         $response = new TicketService($client);
 
-        $this->assertEquals($body, json_encode($response->post($data)));
+        self::assertEquals($body, json_encode($response->post($data), JSON_THROW_ON_ERROR));
     }
 
     /** @test */
-    public function it_should_throw_an_parameter_exception_on_ticket_reply_request()
+    public function it_should_throw_an_parameter_exception_on_ticket_reply_request(): void
     {
         $this->expectException(TeamworkDeskParameterException::class);
         (new TicketService)->reply([]);
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_ticket_reply_request()
+    public function it_should_throw_an_http_exception_on_ticket_reply_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
@@ -116,17 +124,19 @@ class TeamworkTicketsTest extends TeamworkTestCase
         (new TicketService)->reply(['ticketId' => 1]);
     }
 
-    /** @test */
-    public function it_should_post_a_reply_and_return_back_the_ticket()
+    /** @test
+     * @throws \JsonException
+     */
+    public function it_should_post_a_reply_and_return_back_the_ticket(): void
     {
-        $body     = file_get_contents(__DIR__.'/Mock/Tickets/ticket-reply-response.json');
+        $body     = file_get_contents(__DIR__ . '/Mock/Tickets/ticket-reply-response.json');
         $client   = $this->mockClient(200, $body);
         $response = new TicketService($client);
 
-        $this->assertEquals($body, json_encode($response->reply([
+        self::assertEquals($body, json_encode($response->reply([
             'ticketId'   => 2201568,
             'body'       => 'Reply TEST on ticket.',
             'customerId' => 65465,
-        ])));
+        ]), JSON_THROW_ON_ERROR));
     }
 }

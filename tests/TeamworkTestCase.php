@@ -15,9 +15,6 @@ use Orchestra\Testbench\TestCase;
 
 class TeamworkTestCase extends TestCase
 {
-    /**
-     * @var Application
-     */
     protected $app;
 
     protected TicketService $tickets;
@@ -25,11 +22,11 @@ class TeamworkTestCase extends TestCase
     /**
      * Define environment setup.
      *
-     * @param Application $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         // Setup the Teamwork domain and API Key
         $app['config']->set('teamwork-desk.domain', 'somedomain');
@@ -43,11 +40,11 @@ class TeamworkTestCase extends TestCase
      * Build the request for file upload.
      *
      * @param string $fileName
-     * @param bool $multiple
+     * @param bool   $multiple
      *
      * @return Request
      */
-    protected function getUploadFileRequest($fileName, $multiple = false)
+    protected function getUploadFileRequest(string $fileName, $multiple = false): Request
     {
         Storage::fake('avatars');
 
@@ -81,7 +78,7 @@ class TeamworkTestCase extends TestCase
      *
      * @return Client
      */
-    protected function mockClient($status, $body)
+    protected function mockClient($status, $body): Client
     {
         $mock    = new MockHandler([new Response($status, [], $body)]);
         $handler = HandlerStack::create($mock);
