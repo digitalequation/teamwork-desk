@@ -2,7 +2,6 @@
 
 namespace DigitalEquation\TeamworkDesk\Models;
 
-use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
@@ -18,8 +17,8 @@ class SupportTicket extends Model
      |--------------------------------------------------------------------------
      |
      */
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(config('teamwork-desk.user_model'));
     }
 }
