@@ -2,8 +2,8 @@
 
 namespace DigitalEquation\TeamworkDesk\Tests;
 
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException;
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkParameterException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskHttpException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskParameterException;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 
 class TeamworkTicketsTest extends TeamworkTestCase
@@ -13,7 +13,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->priorities();
     }
 
@@ -32,7 +32,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->customer(52);
     }
 
@@ -51,7 +51,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->ticket(6545);
     }
 
@@ -70,7 +70,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->post([]);
     }
 
@@ -103,7 +103,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     /** @test */
     public function it_should_throw_an_parameter_exception_on_ticket_reply_request()
     {
-        $this->expectException(TeamworkParameterException::class);
+        $this->expectException(TeamworkDeskParameterException::class);
         (new TicketService)->reply([]);
     }
 
@@ -112,7 +112,7 @@ class TeamworkTicketsTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->reply(['ticketId' => 1]);
     }
 

@@ -2,9 +2,9 @@
 
 namespace DigitalEquation\TeamworkDesk\Tests;
 
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkHttpException;
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkInboxException;
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkUploadException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskHttpException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskInboxException;
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskUploadException;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 
 class TeamworkDeskTest extends TeamworkTestCase
@@ -14,7 +14,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->me();
     }
 
@@ -33,7 +33,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         (new TicketService)->inboxes();
     }
 
@@ -50,7 +50,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     /** @test */
     public function it_should_throw_an_inbox_exception()
     {
-        $this->expectException(TeamworkInboxException::class);
+        $this->expectException(TeamworkDeskInboxException::class);
 
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/inboxes-response.json');
         $client   = $this->mockClient(200, $body);
@@ -63,7 +63,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
         $this->tickets->inbox('undefined');
     }
 
@@ -81,7 +81,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     /** @test */
     public function it_should_throw_an_upload_exception_on_post_upload_request()
     {
-        $this->expectException(TeamworkUploadException::class);
+        $this->expectException(TeamworkDeskUploadException::class);
 
         (new TicketService)->upload(24234, '');
     }
@@ -91,7 +91,7 @@ class TeamworkDeskTest extends TeamworkTestCase
     {
         $this->app['config']->set('teamwork-desk.domain', 'undefined');
 
-        $this->expectException(TeamworkHttpException::class);
+        $this->expectException(TeamworkDeskHttpException::class);
 
         $request = $this->getUploadFileRequest('file');
         (new TicketService)->upload(423423, $request->file);
