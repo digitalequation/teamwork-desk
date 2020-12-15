@@ -3,14 +3,15 @@
 namespace DigitalEquation\TeamworkDesk\Contracts\Repositories;
 
 use App\User;
-use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 
 interface TicketRepository
 {
     /**
      * TicketRepository constructor.
+     *
      * @param TicketService $service
      */
     public function __construct(TicketService $service);
@@ -18,12 +19,12 @@ interface TicketRepository
     /**
      * Create a new ticket.
      *
-     * @param User $user
-     * @param TicketRequest $data
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param array                                      $data
      *
      * @return array
      */
-    public function create(User $user, TicketRequest $data): array;
+    public function create(Authenticatable $user, array $data): array;
 
     /**
      * Upload a file to Teamwork Desk.
