@@ -2,19 +2,16 @@
 
 namespace DigitalEquation\TeamworkDesk\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketReplyRequest;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Notifications\SupportTicket as SupportTicketNotification;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 use Exception;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 
-class TeamworkDeskAPIController extends Controller
+class TeamworkDeskAPIController
 {
     protected TicketRepository $ticket;
 
@@ -22,48 +19,42 @@ class TeamworkDeskAPIController extends Controller
 
     public function __construct(TicketRepository $ticket, TicketService $service)
     {
-        $this->middleware(config('teamwork-desk.authorization'))->only([
-            'getIndex',
-            'postIndex',
-            'putIndex',
-            'deleteIndex',
-            'postUpload',
-        ]);
-
         $this->ticket  = $ticket;
         $this->service = $service;
     }
 
     /**
-     * Return all tickets for the current user.
+     * Return a list of tickets.
      *
-     * @return ResponseFactory|Response
-     * @throws Exception
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function getIndex()
+    public function getIndex(): \Illuminate\Http\JsonResponse
     {
         $customerId = Auth::user()->customer_support_id;
 
         $priorities = $this->service->priorities();
         $tickets    = !empty($customerId) ? $this->service->customer($customerId) : [];
 
-        return success([
+        return response()->json([
+            'success'    => true,
             'priorities' => $priorities,
-            'tickets'    => !empty($tickets['tickets']) && is_array($tickets['tickets']) ? array_reverse($tickets['tickets']) : [],
+            'tickets'    => !empty($tickets['tickets']) && is_array($tickets['tickets']) ?
+                array_reverse($tickets['tickets']) : [],
         ]);
     }
 
     /**
-     * Get a single ticket by id.
+     * Return single ticket.
      *
      * @param int $id
      *
-     * @return ResponseFactory|Response
-     * @throws Exception
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function getTicket($id)
+    public function getTicket(int $id): \Illuminate\Http\JsonResponse
     {
-        return success(['ticket' => $this->service->ticket($id)['ticket']]);
+        return response()->json([
+            'success' => true,
+            'ticket'  => $this->service->ticket($id)['ticket']]);
     }
 
     /**
@@ -71,21 +62,26 @@ class TeamworkDeskAPIController extends Controller
      *
      * @param TicketRequest $request
      *
-     * @return ResponseFactory|Response
-     * @throws Exception
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postIndex(TicketRequest $request)
+    public function postIndex(TicketRequest $request): \Illuminate\Http\JsonResponse
     {
         try {
             $user = Auth::user();
 
-            $ticket = $this->ticket->create($user, $request);
+            $ticket = $this->ticket->create($user, $request->all());
 
             $user->notify(new SupportTicketNotification($ticket));
 
-            return success(['teamwork' => $ticket]);
+            return response()->json([
+                'success'  => true,
+                'teamwork' => $ticket,
+            ]);
         } catch (Exception $e) {
-            return error($e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -94,13 +90,14 @@ class TeamworkDeskAPIController extends Controller
      *
      * @param TicketReplyRequest $request
      *
-     * @return ResponseFactory|Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws Exception
      */
-    public function postReply(TicketReplyRequest $request)
+    public function postReply(TicketReplyRequest $request): \Illuminate\Http\JsonResponse
     {
-        return success([
-            'ticket' => $this->service->reply($request->all()),
+        return response()->json([
+            'success' => true,
+            'ticket'  => $this->service->reply($request->all()),
         ]);
     }
 
@@ -109,13 +106,15 @@ class TeamworkDeskAPIController extends Controller
      *
      * @param Request $request
      *
-     * @return ResponseFactory|Response
-     * @throws Exception
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postUpload(Request $request)
+    public function postUpload(Request $request): \Illuminate\Http\JsonResponse
     {
         if (!$request->hasFile('files')) {
-            return error('No files selected for upload...');
+            return response()->json([
+                'success' => false,
+                'message' => 'No files selected for upload...',
+            ]);
         }
 
         $files       = [];
@@ -126,7 +125,8 @@ class TeamworkDeskAPIController extends Controller
             $files[]       = $response;
         }
 
-        return success([
+        return response()->json([
+            'success'     => true,
             'attachments' => [
                 'ids'   => $attachments,
                 'files' => $files,
