@@ -32,7 +32,6 @@ class SupportTicket extends Notification
      */
     public function via($notifiable): array
     {
-        // return [DigitalChannel::class, 'mail'];
         return [DigitalChannel::class];
     }
 
