@@ -2,10 +2,8 @@
 
 namespace DigitalEquation\TeamworkDesk\Repositories;
 
-use App\User;
 use DB;
 use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository as TicketRepositoryContract;
-use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 use Illuminate\Http\Request;
@@ -27,23 +25,23 @@ class TicketRepository implements TicketRepositoryContract
     /**
      * @inheritDoc
      */
-    public function create(User $user, TicketRequest $data): array
+    public function create($user, array $data): array
     {
         return DB::try(function () use ($user, $data) {
             $payload = [
                 'assignedTo'          => $this->service->me()['user']['id'],
                 'inboxId'             => $this->service->inbox(config('teamwork-desk.inbox'))['id'],
                 'tags'                => 'Ticket',
-                'priority'            => $data->priority ?? 'low',
+                'priority'            => $data['priority'] ?? 'low',
                 'status'              => 'active',
                 'source'              => 'Email (Manual)',
                 'customerFirstName'   => $user->first_name,
                 'customerLastName'    => $user->last_name,
                 'customerEmail'       => $user->email,
                 'customerPhoneNumber' => $user->phone,
-                'subject'             => $data->subject,
-                'previewTest'         => $data->subject,
-                'message'             => $data->message,
+                'subject'             => $data['subject'],
+                'previewTest'         => $data['subject'],
+                'message'             => $data['message'],
             ];
 
             $response = $this->service->post($payload);
