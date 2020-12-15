@@ -39,8 +39,20 @@ return [
      | This will be used in the controller middleware as:
      | $this->middleware('role:user')...
      |
+     | Can be use with permissions to:
+     | ['permission:read_support_tickets', 'permission:write_support_tickets']
      */
     'authorization' => 'role:user',
+
+    /*
+     |--------------------------------------------------------------------------
+     | User Model
+     |--------------------------------------------------------------------------
+     |
+     | Set the user model with namespace.
+     |
+     */
+    'user_model' => App\User::class,
 
     /*
     |--------------------------------------------------------------------------
