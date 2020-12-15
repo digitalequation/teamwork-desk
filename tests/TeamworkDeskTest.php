@@ -4,7 +4,6 @@ namespace DigitalEquation\TeamworkDesk\Tests;
 
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskHttpException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskInboxException;
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskUploadException;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -73,7 +72,9 @@ class TeamworkDeskTest extends TeamworkTestCase
         $this->tickets->inbox('undefined');
     }
 
-    /** @test */
+    /** @test
+     * @throws \JsonException
+     */
     public function it_should_return_the_inbox_data(): void
     {
         $body     = file_get_contents(__DIR__ . '/Mock/Desk/inboxes-response.json');
@@ -81,7 +82,7 @@ class TeamworkDeskTest extends TeamworkTestCase
         $response = new TicketService($client);
 
         $inboxResponse = file_get_contents(__DIR__ . '/Mock/Desk/inbox-response.json');
-        self::assertEquals($inboxResponse, json_encode($response->inbox('Inbox 1')));
+        self::assertEquals($inboxResponse, json_encode($response->inbox('Inbox 1'), JSON_THROW_ON_ERROR));
     }
 
     /** @test */
