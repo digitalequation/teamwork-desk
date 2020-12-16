@@ -71,7 +71,7 @@ class TeamworkDeskAPIController
 
             $ticket = $this->ticket->create($user, $request->validated());
 
-            event(new SupportTicketCreated($ticket));
+            event(new SupportTicketCreated(compact('user', 'ticket')));
 
             return response()->json([
                 'success'  => true,
