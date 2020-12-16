@@ -3,24 +3,15 @@
 namespace DigitalEquation\TeamworkDesk\Http\Controllers;
 
 use DB;
+use DigitalEquation\TeamworkDesk\Events\SupportTicketWebhookReceived;
 use DigitalEquation\TeamworkDesk\Models\SupportTicket;
-use DigitalEquation\TeamworkDesk\Notifications\SupportTicket as SupportTicketNotification;
-use Illuminate\Config\Repository;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Notification;
 use JsonException;
 
 class TeamworkDeskWebhookController
 {
-    /**
-     * @var Repository|mixed
-     */
     protected string $secretToken;
 
-    /**
-     * @var string
-     */
     protected string $teamworkDeskUrl;
 
     /**
@@ -39,21 +30,22 @@ class TeamworkDeskWebhookController
      * Send notification to user when ticket priority changes
      *
      * @param Request $request
-     * @return mixed
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postPriority(Request $request)
+    public function postPriority(Request $request): \Illuminate\Http\JsonResponse
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
 
         // Notification content
         $content = [
-            'body' => sprintf(
+            'content' => sprintf(
                 'The priority for your support ticket with the id
                 <strong class="red-500">%s</strong> was set to <strong class="ticket-priority %s">%s</strong>.',
                 $data['id'],
                 $data['priority']['name'],
-                ucfirst($data['priority']['name']) ?? 'None'
+                ucfirst($data['priority']['name']) ?: 'None'
             ),
 
             'action_text' => 'View',
@@ -64,7 +56,9 @@ class TeamworkDeskWebhookController
             ),
         ];
 
-        return $this->buildNotification($request, $data['id'], $content);
+        return response()->json([
+            'success' => $this->dispatchNotification($request, $data['id'], $content),
+        ]);
     }
 
     /**
@@ -72,16 +66,16 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postStatus(Request $request)
+    public function postStatus(Request $request): \Illuminate\Http\JsonResponse
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
 
         // Notification content
         $content = [
-            'body' => sprintf(
+            'content' => sprintf(
                 'The status for your support ticket with the id <strong class="red-500">%s</strong> is now set to <strong class="ticket %s">%s</strong>.',
                 $data['id'],
                 $data['status']['code'],
@@ -96,7 +90,9 @@ class TeamworkDeskWebhookController
             ),
         ];
 
-        return $this->buildNotification($request, $data['id'], $content);
+        return response()->json([
+            'success' => $this->dispatchNotification($request, $data['id'], $content),
+        ]);
     }
 
     /**
@@ -104,16 +100,16 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postReply(Request $request)
+    public function postReply(Request $request): \Illuminate\Http\JsonResponse
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
 
         // Notification content
         $content = [
-            'body' => sprintf(
+            'content' => sprintf(
                 'A new reply was added to your support ticket with the id <strong class="red-500">%s</strong>.',
                 $data['ticket']['id']
             ),
@@ -126,7 +122,9 @@ class TeamworkDeskWebhookController
             ),
         ];
 
-        return $this->buildNotification($request, $data['ticket']['id'], $content);
+        return response()->json([
+            'success' => $this->dispatchNotification($request, $data['ticket']['id'], $content),
+        ]);
     }
 
     /**
@@ -134,16 +132,16 @@ class TeamworkDeskWebhookController
      *
      * @param Request $request
      *
-     * @return mixed
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function postNote(Request $request)
+    public function postNote(Request $request): \Illuminate\Http\JsonResponse
     {
         // Teamwork Desk Webhook data
         $data = $request->all();
 
         // Notification content
         $content = [
-            'body' => sprintf(
+            'content' => sprintf(
                 'A new note was added to your support ticket with the id <strong class="red-500">%s</strong>.',
                 $data['ticket']['id']
             ),
@@ -157,7 +155,9 @@ class TeamworkDeskWebhookController
             ),
         ];
 
-        return $this->buildNotification($request, $data['ticket']['id'], $content);
+        return response()->json([
+            'success' => $this->dispatchNotification($request, $data['ticket']['id'], $content),
+        ]);
     }
 
     /**
@@ -176,7 +176,7 @@ class TeamworkDeskWebhookController
 
             // Notification content
             $content = [
-                'body' => sprintf(
+                'content' => sprintf(
                     'The ticket with the id <strong class="red-500">%s</strong> was deleted.',
                     $data['id']
                 ),
@@ -185,27 +185,26 @@ class TeamworkDeskWebhookController
                 'action_url'  => '',
             ];
 
-            $notification = $this->buildNotification($request, $data['id'], $content);
+            $dispatch = $this->dispatchNotification($request, $data['id'], $content);
 
-            if (json_decode($notification->getContent(), false, 512, JSON_THROW_ON_ERROR)->success) {
-                SupportTicket::where('ticket_id', $data['id'])->delete();
-
-                return success();
+            if (!$dispatch && !SupportTicket::where('ticket_id', $data['id'])->delete()) {
+                return response()->json(['success' => false]);
             }
 
-            return error();
+            return response()->json(['success' => true]);
         });
     }
 
     /**
      * Build the user notification
      *
-     * @param $request
-     * @param int $ticketID
-     * @param $content
-     * @return mixed
+     * @param Request $request
+     * @param int     $ticketID
+     * @param array   $content
+     *
+     * @return bool
      */
-    protected function buildNotification($request, int $ticketID, $content)
+    protected function dispatchNotification(Request $request, int $ticketID, array $content): bool
     {
         // Get request headers
         $apiSignature     = $request->header('x-desk-signature');
@@ -213,7 +212,7 @@ class TeamworkDeskWebhookController
 
         // If HMAC signatures does not match, abort
         if (!$signatureMatches) {
-            l('Bad signature!');
+            l('Teamwork Desk Support Tickets:  Bad signature on webhook token!');
             abort(400);
         }
 
@@ -221,12 +220,17 @@ class TeamworkDeskWebhookController
         $userTicket = SupportTicket::where('ticket_id', $ticketID)->with('user')->first();
 
         if (empty($userTicket)) {
-            return error('Resend status...');
+            return false;
         }
 
-        Notification::send($userTicket->user, new SupportTicketNotification($content));
+        $notification = [
+            'user'   => $userTicket->user,
+            'ticket' => $content,
+        ];
 
-        return success();
+        event(new SupportTicketWebhookReceived($notification));
+
+        return true;
     }
 
     /**
@@ -236,7 +240,7 @@ class TeamworkDeskWebhookController
      *
      * @return boolean
      */
-    protected function checkSignature($apiSignature): bool
+    protected function checkSignature(string $apiSignature): bool
     {
         $body      = file_get_contents('php://input');
         $signature = hash_hmac('sha256', $body, $this->secretToken, false);
