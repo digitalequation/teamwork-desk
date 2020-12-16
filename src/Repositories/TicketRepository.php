@@ -14,17 +14,12 @@ class TicketRepository implements TicketRepositoryContract
 {
     protected TicketService $service;
 
-    /**
-     * @inheritDoc
-     */
+
     public function __construct(TicketService $service)
     {
         $this->service = $service;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function create($user, array $data): array
     {
         return DB::try(function () use ($user, $data) {
@@ -65,7 +60,7 @@ class TicketRepository implements TicketRepositoryContract
             $user->save();
 
             return [
-                'body' => sprintf(
+                'content' => sprintf(
                     'Your message for the support team with the subject <strong class="blue-500">%s</strong>
                             was registered with the number <span class="red-500">%d</span>.',
                     $response['ticket']['Subject'],
@@ -78,9 +73,6 @@ class TicketRepository implements TicketRepositoryContract
         });
     }
 
-    /**
-     * @inheritDoc
-     */
     public function update(Request $request): array
     {
         $customerId = Auth::user()->customer_support_id;
