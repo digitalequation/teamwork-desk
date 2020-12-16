@@ -6,7 +6,7 @@ return [
     | Teamwork Desk Master Switch
     |--------------------------------------------------------------------------
     |
-    | This option may be used to disable SaaS package.
+    | This option may be used to disable the Teamwork Desk package.
     |
     */
     'enabled' => true,
@@ -18,11 +18,11 @@ return [
      |
      | This options are used when building the notification messages.
      |
-     | E.g. for tickets list: support-tickets
-     | Translates to: https://domain.com/support-tickets
+     | E.g. for tickets list: tickets
+     | Translates to: https://domain.com/tickets
      |
      | E.g. for ticket details: ticket
-     | Translates to: https://domain.com/support-tickets/ticket
+     | Translates to: https://domain.com/tickets/ticket
      |
      */
     'tickets_paths' => [
@@ -39,8 +39,11 @@ return [
      | This will be used in the controller middleware as:
      | $this->middleware('role:user')...
      |
-     | Can be use with permissions to:
-     | ['permission:read_support_tickets', 'permission:write_support_tickets']
+     | With user roles:
+     | 'role:user,manager,admin'
+     |
+     | With user permissions:
+     | 'permission:read_support_tickets,write_support_tickets'
      */
     'authorization' => 'role:user',
 
