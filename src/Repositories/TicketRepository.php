@@ -61,8 +61,7 @@ class TicketRepository implements TicketRepositoryContract
 
             return [
                 'content' => sprintf(
-                    'Your message for the support team with the subject <strong class="blue-500">%s</strong>
-                            was registered with the number <span class="red-500">%d</span>.',
+                    'Your message for the support team with the subject <strong class="text--primary">%s</strong> was registered with the number <span class="text--red">%d</span>.',
                     $response['ticket']['Subject'],
                     $response['ticket']['ID']
                 ),
