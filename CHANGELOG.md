@@ -2,6 +2,24 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 2.0.0 - 2020-12-16  
+#### This version has breaking changes so be careful
+- added events for API responses
+- different response content
+- removed stubs
+- removed package commands
+- upgrade dev dependencies
+- misc & fixes
+
+### 1.2.0 - 2020-09-18
+- add option for permission rules
+
+### 1.1.* - 2020-02-**
+- fixes
+
+### 1.1.0 - 2020-09-17
+- add option for URL segments used to generate the link actions on notifications
+
 ### 1.0.5 - 2020-03-05
 - upgrade orchestral/testbench to 5.0
 
