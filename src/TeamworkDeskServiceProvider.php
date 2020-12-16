@@ -13,17 +13,16 @@ class TeamworkDeskServiceProvider extends ServiceProvider
             return;
         }
 
+        // Register routes
+        Route::group($this->routeApiConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        });
+
+        Route::group($this->routeWebConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        });
+
         if ($this->app->runningInConsole()) {
-
-            // Register routes
-            Route::group($this->routeApiConfiguration(), function () {
-                $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-            });
-
-            Route::group($this->routeWebConfiguration(), function () {
-                $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-            });
-
             // Publish config file
             $this->publishes([
                 __DIR__ . '/../config/teamwork-desk.php' => config_path('teamwork-desk.php'),
