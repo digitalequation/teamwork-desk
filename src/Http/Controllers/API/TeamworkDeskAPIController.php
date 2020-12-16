@@ -3,9 +3,9 @@
 namespace DigitalEquation\TeamworkDesk\Http\Controllers\API;
 
 use DigitalEquation\TeamworkDesk\Contracts\Repositories\TicketRepository;
+use DigitalEquation\TeamworkDesk\Events\SupportTicketCreated;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketReplyRequest;
 use DigitalEquation\TeamworkDesk\Http\Requests\TicketRequest;
-use DigitalEquation\TeamworkDesk\Notifications\SupportTicket;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
 use Exception;
 use Illuminate\Http\Request;
@@ -69,9 +69,9 @@ class TeamworkDeskAPIController
         try {
             $user = Auth::user();
 
-            $ticket = $this->ticket->create($user, $request->all());
+            $ticket = $this->ticket->create($user, $request->validated());
 
-            $user->notify(new SupportTicket($ticket));
+            event(new SupportTicketCreated($ticket));
 
             return response()->json([
                 'success'  => true,
@@ -97,7 +97,7 @@ class TeamworkDeskAPIController
     {
         return response()->json([
             'success' => true,
-            'ticket'  => $this->service->reply($request->all()),
+            'ticket'  => $this->service->reply($request->validated()),
         ]);
     }
 
