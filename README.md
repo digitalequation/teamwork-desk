@@ -1,6 +1,8 @@
-# PHP (Laravel) Teamwork Desk (Internal Use)
+# PHP (Laravel) Teamwork Desk (Internal Use) V2
 
 [![Actions Status](https://github.com/digitalequation/teamwork-desk/workflows/Run%20Tests/badge.svg)](https://github.com/digitalequation/teamwork-desk/actions)
+
+###<span style="color:red">For version 1 of the package check the [v1.md](./v1.md) documentation.</span>
 
 ## Installation
 
@@ -10,31 +12,17 @@ You can install the package via composer:
 composer require digitalequation/teamwork-desk
 ```
 
-After the installation is complete, from your project's root run:
+After the installation is complete, publish the migrations and config files:
 ```bash
-php artisan teamwork-desk:install
+php artisan vendor:publish --provider="DigitalEquation\TeamworkDesk\TeamworkDeskServiceProvider"
 ```
 
-This will publish all the files of the package:
-- migrations
-- factories
-- config file
-- service provider
-
-## Usage
-
-Available commands:  
-**NOTE:** passing `--force` to any command will overwrite the already published files.
-``` php
-# Publish the config file
-php artisan teamwork-desk:config
-
-# Publish the database factories 
-php artisan teamwork-desk:factories
-
-# Publish the database migrations
-php artisan teamwork-desk:migrations
+Run the migration:
+```bash
+php artisan migrate
 ```
+
+The package will throw two events, `SupportTicketCreated` and `SupportTicketWebhookReceived` that you can listen to using an event listener subscriber and process the data as you see fit.
 
 ### Testing
 
