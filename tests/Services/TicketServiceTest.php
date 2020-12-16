@@ -2,18 +2,18 @@
 
 namespace DigitalEquation\TeamworkDesk\Tests;
 
-use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskHttpException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskParameterException;
 use DigitalEquation\TeamworkDesk\Services\TicketService;
+use GuzzleHttp\Exception\ClientException;
 
 class TeamworkTicketsTest extends TeamworkTestCase
 {
     /** @test */
-    public function it_should_throw_an_http_exception_on_priorities_request(): void
+    public function it_should_throw_a_client_exception_on_priorities_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkDeskHttpException::class);
+        $this->expectException(ClientException::class);
         (new TicketService)->priorities();
     }
 
@@ -30,11 +30,11 @@ class TeamworkTicketsTest extends TeamworkTestCase
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_customer_tickets_request(): void
+    public function it_should_throw_a_client_exception_on_customer_tickets_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkDeskHttpException::class);
+        $this->expectException(ClientException::class);
         (new TicketService)->customer(52);
     }
 
@@ -51,11 +51,11 @@ class TeamworkTicketsTest extends TeamworkTestCase
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_ticket_request(): void
+    public function it_should_throw_a_client_exception_on_ticket_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkDeskHttpException::class);
+        $this->expectException(ClientException::class);
         (new TicketService)->ticket(6545);
     }
 
@@ -72,11 +72,11 @@ class TeamworkTicketsTest extends TeamworkTestCase
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_create_ticket_request(): void
+    public function it_should_throw_a_client_exception_on_create_ticket_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkDeskHttpException::class);
+        $this->expectException(ClientException::class);
         (new TicketService)->post([]);
     }
 
@@ -116,11 +116,11 @@ class TeamworkTicketsTest extends TeamworkTestCase
     }
 
     /** @test */
-    public function it_should_throw_an_http_exception_on_ticket_reply_request(): void
+    public function it_should_throw_a_client_exception_on_ticket_reply_request(): void
     {
         $this->app['config']->set('teamwork.desk.domain', 'undefined');
 
-        $this->expectException(TeamworkDeskHttpException::class);
+        $this->expectException(ClientException::class);
         (new TicketService)->reply(['ticketId' => 1]);
     }
 
