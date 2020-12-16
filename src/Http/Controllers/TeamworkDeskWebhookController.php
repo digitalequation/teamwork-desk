@@ -224,8 +224,8 @@ class TeamworkDeskWebhookController
         }
 
         $notification = [
-            'user'   => $userTicket->user,
-            'ticket' => $content,
+            'user' => $userTicket->user,
+            'data' => $content,
         ];
 
         event(new SupportTicketWebhookReceived($notification));

@@ -69,13 +69,13 @@ class TeamworkDeskAPIController
         try {
             $user = Auth::user();
 
-            $ticket = $this->ticket->create($user, $request->validated());
+            $data = $this->ticket->create($user, $request->validated());
 
-            event(new SupportTicketCreated(compact('user', 'ticket')));
+            event(new SupportTicketCreated(compact('user', 'data')));
 
             return response()->json([
                 'success'  => true,
-                'teamwork' => $ticket,
+                'teamwork' => $data,
             ]);
         } catch (Exception $e) {
             return response()->json([
