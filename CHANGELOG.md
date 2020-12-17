@@ -2,6 +2,9 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 2.0.1 - 2020-12-17
+- fix request validation rules
+
 ### 2.0.0 - 2020-12-16  
 #### This version has breaking changes so be careful
 - added events for API responses
