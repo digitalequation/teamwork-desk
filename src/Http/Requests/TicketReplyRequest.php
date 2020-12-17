@@ -15,9 +15,11 @@ class TicketReplyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ticketId'   => 'required',
-            'customerId' => 'required',
-            'body'       => 'required',
+            'ticketId'      => 'required',
+            'customerId'    => 'required',
+            'body'          => 'required',
+            'status'        => 'sometimes',
+            'attachmentIds' => 'array',
         ];
     }
 }
