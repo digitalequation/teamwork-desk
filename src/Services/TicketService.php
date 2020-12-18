@@ -2,10 +2,13 @@
 
 namespace DigitalEquation\TeamworkDesk\Services;
 
+use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskHttpException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskInboxException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskJsonException;
 use DigitalEquation\TeamworkDesk\Exceptions\TeamworkDeskParameterException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Psr\Http\Message\StreamInterface;
@@ -93,6 +96,30 @@ class TicketService
         return $this->getResponse(
             $this->client->put('customers/' . $data['customerId'] . '.json', ['json' => $data,])->getBody()
         );
+    }
+
+    public function getFileData(int $id): array
+    {
+        return $this->getResponse(
+            $this->client->get("file/{$id}.json")->getBody()
+        );
+    }
+
+    public function downloadFile(string $url): ?StreamInterface
+    {
+        $client  = new Client();
+        $request = new Request('GET', $url);
+        try {
+            return $client->send($request)->getBody();
+        } catch (GuzzleException $e) {
+            throw new TeamworkDeskHttpException($e->getMessage());
+        }
+    }
+
+    public function downloadAttachment(int $fileId): ?StreamInterface
+    {
+        $file = $this->getFileData($fileId);
+        return $this->downloadFile($file['file']['downloadURL']);
     }
 
     public function upload(int $userId, UploadedFile $file): array
