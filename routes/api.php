@@ -8,4 +8,5 @@ Route::group(['middleware' => config('teamwork-desk.authorization')], function (
     Route::post('tickets', 'TeamworkDeskAPIController@postIndex');
     Route::post('tickets/reply', 'TeamworkDeskAPIController@postReply');
     Route::post('tickets/upload', 'TeamworkDeskAPIController@postUpload');
+    Route::get('tickets/attachment/{id}', 'TeamworkDeskAPIController@getAttachment');
 });
