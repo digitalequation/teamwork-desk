@@ -58,6 +58,18 @@ class TeamworkDeskAPIController
     }
 
     /**
+     * Download attachment by file id.
+     *
+     * @param int $id
+     *
+     * @return \Psr\Http\Message\StreamInterface|null
+     */
+    public function getAttachment(int $id): ?\Psr\Http\Message\StreamInterface
+    {
+        return $this->service->downloadAttachment($id);
+    }
+
+    /**
      * Create a new ticket.
      *
      * @param TicketRequest $request
