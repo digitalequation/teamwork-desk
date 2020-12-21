@@ -105,21 +105,29 @@ class TicketService
         );
     }
 
-    public function downloadFile(string $url): ?StreamInterface
+    public function downloadFile(array $file): array
     {
         $client  = new Client();
-        $request = new Request('GET', $url);
+        $request = new Request('GET', $file['downloadURL']);
+
         try {
-            return $client->send($request)->getBody();
+            $output = $client->send($request)->getBody();
+
+            return [
+                'file_data'      => sprintf('data:%s;base64,%s', $file['mimeType'], base64_encode($output)),
+                'file_name'      => $file['originalFileName'],
+                'mime_type'      => $file['mimeType'],
+                'content_length' => strlen($output),
+            ];
         } catch (GuzzleException $e) {
             throw new TeamworkDeskHttpException($e->getMessage());
         }
     }
 
-    public function downloadAttachment(int $fileId): ?StreamInterface
+    public function downloadAttachment(int $fileId): array
     {
         $file = $this->getFileData($fileId);
-        return $this->downloadFile($file['file']['downloadURL']);
+        return $this->downloadFile($file['file']);
     }
 
     public function upload(int $userId, UploadedFile $file): array

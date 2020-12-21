@@ -62,11 +62,16 @@ class TeamworkDeskAPIController
      *
      * @param int $id
      *
-     * @return \Psr\Http\Message\StreamInterface|null
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function getAttachment(int $id): ?\Psr\Http\Message\StreamInterface
+    public function getAttachment(int $id): \Illuminate\Http\JsonResponse
     {
-        return $this->service->downloadAttachment($id);
+        $file = $this->service->downloadAttachment($id);
+
+        return response()->json([
+            'success' => true,
+            'file'    => $file,
+        ]);
     }
 
     /**
