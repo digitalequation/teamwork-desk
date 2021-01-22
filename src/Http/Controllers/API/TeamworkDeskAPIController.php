@@ -46,11 +46,11 @@ class TeamworkDeskAPIController
     /**
      * Return single ticket.
      *
-     * @param int $id
+     * @param string|int $id
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getTicket(int $id): \Illuminate\Http\JsonResponse
+    public function getTicket($id): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'success' => true,
