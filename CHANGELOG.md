@@ -2,6 +2,9 @@
 
 All notable changes to `teamwork-desk` will be documented in this file
 
+### 2.0.2 - 2021-01-22
+- small fixes
+
 ### 2.0.1 - 2020-12-17
 - fix request validation rules
 
