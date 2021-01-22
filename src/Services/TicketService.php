@@ -62,7 +62,7 @@ class TicketService
         );
     }
 
-    public function ticket(int $ticketId): array
+    public function ticket($ticketId): array
     {
         return $this->getResponse(
             $this->client->get(sprintf('tickets/%s.json', $ticketId))->getBody()
